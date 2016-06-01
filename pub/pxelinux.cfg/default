@@ -1,0 +1,14 @@
+default vesamenu.c32
+prompt 0
+
+MENU TITLE PXE Menu
+LABEL test
+	MENU LABEL test
+	kernel vmlinuz
+	initrd initrd.img 
+	append rootfstype=ramfs root=/dev/ram0 init=/init zram.num_devices=1 quiet
+
+LABEL Lenovo x220
+	MENU LABEL Lenovo x220
+	kernel memdisk
+	append iso initrd=iso/stali.iso raw
