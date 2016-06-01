@@ -1,0 +1,27 @@
+#!/bin/sh
+
+/bin/busybox --install -s
+
+clear
+
+mount -t proc proc /proc
+mount -t sysfs sysfs /sys
+
+mknod /dev/null c 1 3
+mknod /dev/tty c 5 0
+mdev -s
+
+echo 2 > /sys/block/zram0/max_comp_streams
+echo 1G > /sys/block/zram0/disksize
+mkswap /dev/zram0 2>&1 > /dev/null
+swapon /dev/zram0 2>&1 > /dev/null
+
+ip link set eth0 up
+ip addr add `udhcpc | grep Lease | awk '{print $3}'`/24 dev eth0
+#ip addr 
+
+#wget http://10.0.2.2/testimg.img -O - | dd of=/dev/sda bs=4M
+#curl http://10.200.200.199/x220.img | dd of=/dev/sda bs=20M
+#echo "### IMAGE COMPLETE ###"
+
+exec /bin/sh
