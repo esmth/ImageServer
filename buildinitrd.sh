@@ -53,9 +53,9 @@ downloadsrc(){
 # Copy pre downloaded source
 copypredownload(){
 	cd $SROOT/build
-	tar xf /tmp/busybox-1.24.2.tar.bz2 && mv busybox* busybox
-	tar xf /tmp/linux-4.6.tar.xz && mv linux* linux
-	tar xf /tmp/curl-7.49.1.tar.bz2 && mv curl* curl
+	nice -n 19 tar xf /tmp/busybox-1.24.2.tar.bz2 && mv busybox* busybox
+	nice -n 19 tar xf /tmp/linux-4.6.tar.xz && mv linux* linux
+	nice -n 19 tar xf /tmp/curl-7.49.1.tar.bz2 && mv curl* curl
 	cd $SROOT
 }
 
@@ -73,7 +73,7 @@ busyboxbuild(){
 	cd $SROOT/build/busybox
 	make clean
 	cp ../../$BUSYBOXCFG .config
-	make -j$NUMCORES
+	nice -n 19 make -j$NUMCORES
 	cp busybox $SROOT/build/initramdisk/bin/busybox
 	ln -s busybox $SROOT/build/initramdisk/bin/sh
 	cd $SROOT
@@ -84,7 +84,7 @@ linuxbuild(){
 	cd $SROOT/build/linux
 	make clean
 	cp ../../$LINUXCFG .config
-	make -j$NUMCORES
+	nice -n 19 make -j$NUMCORES
 	cp arch/x86_64/boot/bzImage $SROOT/build/vmlinuz
 	cd $SROOT
 }
@@ -94,7 +94,7 @@ curlbuild(){
 	cd $SROOT/build/curl
 	make clean
 	./configure --without-libssh2 --disable-shared CFLAGS='-static -static-libgcc -Wl,-static -lc'
-	make -j$NUMCORES
+	nice -n 19 make -j$NUMCORES
 	cp src/curl $SROOT/build/initramdisk/bin/curl
 	cd $SROOT
 }
@@ -111,15 +111,15 @@ createinitrd(){
 	find . | cpio -H newc -o > ../initrd.cpio
 	cd ..
 	echo '>> Compressing ramdisk'
-	gzip -v -9 < initrd.cpio > initrd.img
+	nice -n 19 gzip -v -9 < initrd.cpio > initrd.img
 	cd $SROOT
 }
 
 #installhostpackages
 cleanbuilddirectory
 prepbuilddirectory
-#downloadsrc
-copypredownload
+downloadsrc
+#copypredownload
 initramdiskskeleton
 busyboxbuild
 linuxbuild

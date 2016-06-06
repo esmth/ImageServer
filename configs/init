@@ -20,8 +20,15 @@ ip link set eth0 up
 ip addr add `udhcpc | grep Lease | awk '{print $3}'`/24 dev eth0
 #ip addr 
 
+CMDLINE=`cat /proc/cmdline`
+# Removes everything before and including 'IMAGE='
+IMAGE=${CMDLINE##* IMAGE=}
+# Removes everything after and including ' initrd'
+IMAGE=${IMAGE%% initrd*}
+echo "### FLASHING $IMAGE IMAGE ###"
+
 #wget http://10.0.2.2/testimg.img -O - | dd of=/dev/sda bs=4M
-#curl http://10.200.200.199/x220.img | dd of=/dev/sda bs=20M
-#echo "### IMAGE COMPLETE ###"
+curl http://10.200.200.199/$IMAGE.img | dd of=/dev/sda bs=16M
+echo "### IMAGE COMPLETE ###"
 
 exec /bin/sh
